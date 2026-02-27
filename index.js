@@ -40,3 +40,18 @@ const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`Sunucu ${PORT} üzerinde çalışıyor`);
 });
+
+socket.on('yoklama-gonder', (data) => {
+    // Öğrencinin socket id'sini veriye ekleyip öğretmene gönderiyoruz
+    data.ogrenciSocketId = socket.id; 
+    socket.to(data.roomId).emit('yoklama-tetikle', data);
+});
+
+// Öğretmenden (content.js) gelen başarı onayını öğrenciye ilet
+socket.on('yoklama-basarili-onay', (data) => {
+    if (data.ogrenciSocketId) {
+        io.to(data.ogrenciSocketId).emit('sisteme-islendi-onayi', {
+            mesaj: "Yoklamanız okul sistemine başarıyla kaydedildi!"
+        });
+    }
+});
