@@ -1,5 +1,8 @@
 // Render'dan aldığın sunucu URL'sini buraya yapıştır
-const socket = io("https://yoklama-sunucu.onrender.com");
+// Render URL'nin sonuna eğik çizgi (/) koymadığından emin ol
+const socket = io("https://yoklama-sunucu.onrender.com", {
+    transports: ["websocket", "polling"] // Bağlantı yöntemlerini zorla
+});
 
 // URL'deki ?room=ders101 kısmını yakalar
 const urlParams = new URLSearchParams(window.location.search);
