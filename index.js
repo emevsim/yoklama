@@ -1,34 +1,42 @@
 const express = require('express');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
-  cors: { origin: "*" } // Güvenlik için her yerden gelen isteğe izin veriyoruz (test için)
+const httpServer = createServer(app);
+
+// CORS ayarlarını en güvenli ve açık hale getiriyoruz
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*", // Tüm kökenlere (GitHub Pages dahil) izin ver
+    methods: ["GET", "POST"]
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send('Yoklama Sunucusu Aktif!');
 });
 
 io.on('connection', (socket) => {
-  console.log('Bir kullanıcı bağlandı:', socket.id);
+  console.log('Kullanıcı bağlandı:', socket.id);
 
-  // Öğretmen bir "oda" oluşturur (Ders ID'sine göre)
   socket.on('join-room', (roomId) => {
     socket.join(roomId);
-    console.log(`Cihaz ${roomId} odasına katıldı.`);
+    console.log(`Oda katılımı: ${roomId}`);
   });
 
-  // Öğrenciden gelen yoklama verisi
   socket.on('yoklama-gonder', (data) => {
-    // data: { roomId: 'mat101', ogrenciNo: '12345' }
-    console.log(`Yoklama alındı: ${data.ogrenciNo}`);
-    
-    // Aynı odadaki öğretmene bu veriyi ilet
+    console.log('Yoklama verisi alındı:', data);
+    // Veriyi odadaki diğerlerine (öğretmene) gönder
     socket.to(data.roomId).emit('yoklama-tetikle', data.ogrenciNo);
   });
 
   socket.on('disconnect', () => {
-    console.log('Kullanıcı ayrıldı.');
+    console.log('Kullanıcı ayrıldı');
   });
 });
 
-const PORT = 3000;
-http.listen(PORT, () => {
-  console.log(`Sunucu http://localhost:${PORT} üzerinde çalışıyor.`);
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+  console.log(`Sunucu ${PORT} üzerinde çalışıyor`);
 });
