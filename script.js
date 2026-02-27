@@ -1,6 +1,6 @@
 // Render'dan aldığın sunucu URL'sini buraya yapıştır
 // Render URL'nin sonuna eğik çizgi (/) koymadığından emin ol
-const socket = io("https://yoklama-sunucu.onrender.com", {
+const socket = io("https://yoklama-kw80.onrender.com", {
     transports: ["websocket", "polling"] // Bağlantı yöntemlerini zorla
 });
 
