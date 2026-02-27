@@ -40,6 +40,14 @@ io.on('connection', (socket) => {
       }
   });
 
+  socket.on('yoklamayi-bitir-herkese-duyur', () => {
+      const roomId = Array.from(socket.rooms)[1]; 
+      if(roomId) {
+          // O odadaki herkese (öğrencilere de) "Bağlantıyı Kes" emri gönder
+          io.to(roomId).emit('yoklama-durduruldu');
+      }
+  });
+
   socket.on('disconnect', () => {
     console.log('Kullanıcı ayrıldı');
   });
